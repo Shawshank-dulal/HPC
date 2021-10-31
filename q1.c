@@ -17,26 +17,13 @@ void readMatrices()
     float matval = 0.0;
     int col1, row2;
 
-    fp = fopen("SampleMatricesWithErrors.txt", "r");
-    for (int ind = 0; ind < position * 2 - 2; ind++)
-    {
-        fscanf(fp, "%d,%d", &rows, &cols);
-        // printf("Rows: %d, Cols: %d\n", rows, cols);
-        for (row = 0; row < rows; row++)
-        {
-            for (col = 0; col < cols - 1; col++)
-            {
-                fscanf(fp, "%f,", &matval);
-            }
-            fscanf(fp, "%f\n", &matval);
-        }
-    }
+    fp = fopen("SampleMatricesWithErrors4.txt", "r");
 
     float matrixArr[rows * cols];
     float matrix1[rows][cols], matrix2[cols][rows];
     int count = 1;
 
-    if (count == 1)
+    while (!feof(fp))
     {
         fscanf(fp, "%d,%d", &rows, &cols);
         col1 = cols;
@@ -49,40 +36,30 @@ void readMatrices()
             }
             fscanf(fp, "\n");
         }
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-            {
-                printf("%f\t", matrix1[i][j]);
-            }
-            printf("\n");
-        }
-        count++;
-    }
-    if (count == 2)
-    {
         fscanf(fp, "%d,%d", &rows, &cols);
         printf("Matrix 2: Rows: %d, Cols: %d\n", rows, cols);
-
         if (col1 != rows)
         {
-            printf("this matrix combination cannot be multiplied");
-        }
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
+            printf("this matrix combination cannot be multiplied\n");
+            for (int i = 0; i < rows; i++)
             {
-                fscanf(fp, "%f,", &matrix1[i][j]);
+                for (int j = 0; j < cols; j++)
+                {
+                    fscanf(fp, "%f,", &matrix1[i][j]);
+                }
+                fscanf(fp, "\n");
             }
-            fscanf(fp, "\n");
         }
-        for (int i = 0; i < rows; i++)
+        else
         {
-            for (int j = 0; j < cols; j++)
+            for (int i = 0; i < rows; i++)
             {
-                printf("%f\t", matrix1[i][j]);
+                for (int j = 0; j < cols; j++)
+                {
+                    fscanf(fp, "%f,", &matrix1[i][j]);
+                }
+                fscanf(fp, "\n");
             }
-            printf("\n");
         }
     }
 }
@@ -102,7 +79,5 @@ void main(int argc, char *argv[])
     // for(int i=0;i<nThreads;i++){
     //     pthread_create(&threadId[j], NULL, primecalc, (void *)&s1[j]);
     // }
-    printf("plese enter which matrix combination you want to use:");
-    scanf("%d", &position);
     readMatrices();
 }
