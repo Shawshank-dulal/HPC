@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <cuda_runtime_api.h>
-#include <time.h>
-#include <crypt.h>
 
 
 //cuda encrypter
@@ -49,7 +47,6 @@ __device__ bool cudaCmp(char* s1,char* s2){
 }
 
 
-
 //crack kernel
 __global__ void CudaCrack(char *character, char *number){
     char generatedPass[4];
@@ -60,6 +57,7 @@ __global__ void CudaCrack(char *character, char *number){
     generatedPass[3]=number[threadIdx.y];
 
     char *enc=CudaCrypt(generatedPass);
+	printf("PAssword: %s enc: %s\n",generatedPass,enc);
     if(cudaCmp(enc,pass))
         printf("%s\n",generatedPass);
 }
