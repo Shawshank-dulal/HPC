@@ -43,7 +43,10 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
     {
         int pos = width * (current_h + 1) + current_w + 1;
         int pixel = pos * 4;
-        t_r += imageInput[pixel];
+        t_r += imageInput[pixel];  
+        t_g += imageInput[1 + pixel];
+        t_b += imageInput[2 + pixel];
+        t_a += imageInput[3 + pixel];
         counter++;
     }
     if (i + 1 <= height)

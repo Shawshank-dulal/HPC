@@ -4,6 +4,16 @@
 #include "lodepng.cpp"
 #include <cuda_runtime_api.h>
 
+/*In this program, an input image is blurred using the Gaussian blur technique and the program runs on cuda
+it makes use of lodepng library to encode and decode the images. The image is converted into an array and the block index and
+thread index is used to determine the pixel location of the image and then an average of the neighboring pixels is taken in
+order to blur the image.
+
+To run the program first compile it by running: nvcc Portfolio_Task_4.cu -o <output_filename> -lodepng.cpp
+then run the command: ./<output_filename>
+and the blurre image is saved as "generated.png" in the same folder
+
+*/
 unsigned int error, encError;
 unsigned char *imageInput, *imageOutput;
 unsigned int width;
@@ -19,12 +29,12 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
     printf("index: %d current W= %d current h= %d\n", idx, current_w, current_h);
     float t_r = 0, t_g = 0, t_b = 0, t_a = 0, counter = 1;
 
-    t_r += imageInput[pixel];
+    t_r += imageInput[pixel]; // Adding the central pixel values of the input image
     t_g += imageInput[1 + pixel];
     t_b += imageInput[2 + pixel];
     t_a += imageInput[3 + pixel];
     counter++;
-    if (i + 1 <= height && j - 1 > 0)
+    if (i + 1 <= height && j - 1 > 0) // checking if the bottom left pixel is existing or not and adding if it exists
     {
         int pos = width * (current_h + 1) + current_w - 1;
         int pixel = pos * 4;
@@ -34,7 +44,7 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
         t_a += imageInput[3 + pixel];
         counter++;
     }
-    if (j + 1 <= width)
+    if (j + 1 <= width) // checking if the right most pixel is present or not
     {
         int pos = width * (current_h) + current_w + 1;
         int pixel = pos * 4;
@@ -44,14 +54,17 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
         t_a += imageInput[3 + pixel];
         counter++;
     }
-    if (i + 1 <= height && j + 1 <= width)
+    if (i + 1 <= height && j + 1 <= width) // checking for bottom right pixel
     {
         int pos = width * (current_h + 1) + current_w + 1;
         int pixel = pos * 4;
         t_r += imageInput[pixel];
+        t_g += imageInput[1 + pixel];
+        t_b += imageInput[2 + pixel];
+        t_a += imageInput[3 + pixel];
         counter++;
     }
-    if (i + 1 <= height)
+    if (i + 1 <= height) // checking for bottom pixel
     {
         int pos = width * (current_h + 1) + current_w;
         int pixel = pos * 4;
@@ -61,7 +74,7 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
         t_a += imageInput[3 + pixel];
         counter++;
     }
-    if (j - 1 > 0)
+    if (j - 1 > 0) // checking for left pixel
     {
         int pos = width * (current_h) + current_w - 1;
         int pixel = pos * 4;
@@ -71,7 +84,7 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
         t_a += imageInput[3 + pixel];
         counter++;
     }
-    if (i - 1 > 0)
+    if (i - 1 > 0) // checking for top pixel
     {
         int pos = width * (current_h - 1) + current_w;
         int pixel = pos * 4;
@@ -81,8 +94,28 @@ __global__ void cudaBlur(unsigned char *imageInput, unsigned char *imageOutput, 
         t_a += imageInput[3 + pixel];
         counter++;
     }
+    if (i - 1 > 0 && j - 1 > 0) // checking for top left pixel
+    {
+        int pos = width * (current_h - 1) + current_w - 1;
+        int pixel = pos * 4;
+        t_r += imageInput[pixel];
+        t_g += imageInput[1 + pixel];
+        t_b += imageInput[2 + pixel];
+        t_a += imageInput[3 + pixel];
+        counter++;
+    }
+    if (i - 1 > 0 && j + 1 <= width)// checking for top right pixel
+    {
+        int pos = width * (current_h - 1) + current_w + 1;
+        int pixel = pos * 4;
+        t_r += imageInput[pixel];
+        t_g += imageInput[1 + pixel];
+        t_b += imageInput[2 + pixel];
+        t_a += imageInput[3 + pixel];
+        counter++;
+    }
 
-    int current_pixel = idx * 4;
+    int current_pixel = idx * 4; //averaging all the existent pixels to get the blurred pixel value 
     imageOutput[current_pixel] = t_r / counter;
     imageOutput[current_pixel + 1] = t_g / counter;
     imageOutput[current_pixel + 2] = t_b / counter;

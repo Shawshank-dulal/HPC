@@ -6,7 +6,14 @@
 #define true 1
 #define false 0
 
-/* sample passwords:
+/* This program runs on CUDA platform to decrypt the encrypted password that we get from the CUDACrypt program
+after the CUDA processor finally finds the password for the provided encryption, it returns the password to the main program and
+it is printed on the screen from there.
+In order to run the program first compile it by command: nvcc Portfolio_Task_3.cu -o <output_filename>
+then run it by the command: ./<output_filename <encrypted_password>
+you can find some encrypted passwords below
+
+ sample passwords:
 E X 5 3 = GCFBUW7371
 B Y 2 1 = DBCCVX4053
 W X 4 2 = YUXBUW6262
